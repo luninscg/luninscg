@@ -1,0 +1,47 @@
+2025-07-12 14:57:48 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T14:57:48.999Z"}
+2025-07-12 15:02:31 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:02:31.271Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:03:02.170Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:03:08.935Z"}
+2025-07-12 15:04:38 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:04:38.834Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:673:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:350:30)","timestamp":"2025-07-12T15:09:50.753Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:673:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:350:30)","timestamp":"2025-07-12T15:10:13.305Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:673:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:350:30)","timestamp":"2025-07-12T15:10:39.298Z"}
+2025-07-12 15:12:38 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:12:38.726Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:12:59.604Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:13:06.800Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:15:02.357Z"}
+2025-07-12 15:18:20 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:18:20.503Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:18:27.630Z"}
+2025-07-12 15:18:45 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:18:45.881Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:18:46.580Z"}
+2025-07-12 15:19:02 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:19:02.816Z"}
+2025-07-12 15:20:54 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:20:54.656Z"}
+2025-07-12 15:21:33 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:21:33.583Z"}
+2025-07-12 15:22:21 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:22:21.955Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:22:26.868Z"}
+2025-07-12 15:22:46 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:22:46.561Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:22:52.124Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:22:57.466Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:675:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:352:30)","timestamp":"2025-07-12T15:23:05.344Z"}
+2025-07-12 15:25:10 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:25:10.176Z"}
+2025-07-12 15:25:31 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:25:31.802Z"}
+{"level":"error","message":"[AI-ERROR-undefined] Erro na geração de resposta: personalizationEngine is not defined","stack":"ReferenceError: personalizationEngine is not defined\n    at getAiResponse (/home/lunins/trae/luninscg/sales-agent-complete/index.js:692:33)\n    at processIncomingMessage (/home/lunins/trae/luninscg/sales-agent-complete/index.js:369:30)","timestamp":"2025-07-12T15:25:57.590Z"}
+2025-07-12 15:27:16 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:27:16.652Z"}
+2025-07-12 15:40:42 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:40:42.842Z"}
+2025-07-12 15:45:48 [INFO]: Índices de database criados com sucesso 
+{"level":"info","message":"🔗 Dashboard disponível em http://localhost:3001/dashboard","timestamp":"2025-07-12T15:45:48.704Z"}

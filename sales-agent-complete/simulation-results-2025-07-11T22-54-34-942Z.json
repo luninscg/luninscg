@@ -1,0 +1,34 @@
+{
+  "personality": {
+    "totalTests": 10000,
+    "successCount": 0,
+    "successRate": 0,
+    "totalTime": 44,
+    "averageTime": 0.0044
+  },
+  "campaigns": {
+    "totalTests": 5000,
+    "uniqueMessages": 1,
+    "uniquenessRate": 0.02,
+    "totalTime": 15
+  },
+  "antiRobotic": {
+    "totalTests": 20000,
+    "globalVariations": 25,
+    "globalUniqueness": 0.13,
+    "messageGroups": {
+      "Obrigado pelo seu interesse!": {},
+      "Vou te explicar como funciona.": {},
+      "Entendi sua situação.": {},
+      "Que bom que você perguntou!": {},
+      "Vamos resolver isso juntos.": {}
+    },
+    "totalTime": 89
+  },
+  "summary": {
+    "totalTests": 50000,
+    "totalTime": 154,
+    "averageTimePerTest": 0.00308,
+    "timestamp": "2025-07-11T22:54:34.924Z"
+  }
+}

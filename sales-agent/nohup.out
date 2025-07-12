@@ -1,0 +1,92 @@
+nohup: ignoring input
+Inicializando clientes de API...
+Clientes de API inicializados com sucesso.
+Autenticação com Google Sheets OK.
+🚀 Servidor iniciado na porta 3001
+[5567777888999] Trava ativada. Processando tipo: text
+[5567777888999] Iniciando processamento da mensagem...
+[5567777888999] Buscando no dossiê...
+[5567777888999] Dossiê processado: encontrado
+Buscando novo prompt da planilha...
+Novo prompt carregado e cache atualizado.
+[5567777888999] Carregando informações da planilha...
+[5567777888999] Planilha carregada, acessando aba CRM...
+[5567777888999] Obtendo linhas do CRM...
+[5567777888999] Buscando usuário existente...
+[5567777888999] Usuário encontrado: false Estágio atual: 0
+[5567777888999] Fonte do lead identificada: *Organico*
+[5567777888999] Obtendo histórico e dados conhecidos...
+[5567777888999] Histórico carregado, tamanho: 0 Dados conhecidos: []
+[5567777888999] Estágio: 0. Processando input para IA: "Olá, quero saber sobre energia solar"
+[5567777888999] Chamando getAiResponse...
+[DEBUG] Iniciando getAiResponse...
+[DEBUG] SystemPrompt length: 7255
+[DEBUG] Chat iniciado com sucesso
+[DEBUG] Enviando mensagem para IA...
+[DEBUG] Resposta recebida da IA
+Resposta bruta do Gemini: ```json
+{
+  "response_message": "Olá! Tudo bem? Meu nome é Gabriel Luz, Arquiteto de Soluções Energéticas da Energia A, aqui de Campo Grande mesmo.  Agradeço seu contato.  Como posso te ajudar hoje a economizar em sua conta de energia?|||Interessante sua pergunta sobre energia solar. Aqui na Energia A, nós oferecemos um sistema diferente, que simplifica tudo: você não precisa se preocupar com instalação de placas, nem com investimento inicial.  A gente cuida de tudo para você!",
+  "next_stage": 2,
+  "name": null,
+  "cpf": null,
+  "email": null,
+  "address_logradouro": null,
+  "address_numero": null,
+  "address_bairro": null,
+  "address_cidade": null,
+  "address_uf": null,
+  "consumo_medio": null,
+  "taxa_iluminacao": null,
+  "tipo_conexao": null,
+  "summary": "Primeiro contato, cliente demonstrou interesse em energia solar.",
+  "interest_level": "Médio",
+  "tags": ["energia_solar", "primeiro_contato", "interesse_inicial"]
+}
+```
+
+[5567777888999] getAiResponse retornou: {"response_message":"Olá! Tudo bem? Meu nome é Gabriel Luz, Arquiteto de Soluções Energéticas da Energia A, aqui de Campo Grande mesmo.  Agradeço seu contato.  Como posso te ajudar hoje a economizar em sua conta de energia?|||Interessante sua pergunta sobre energia solar. Aqui na Energia A, nós oferecemos um sistema diferente, que simplifica tudo: você não precisa se preocupar com instalação de placas, nem com investimento inicial.  A gente cuida de tudo para você!","next_stage":2,"name":null,"cpf":null,"email":null,"address_logradouro":null,"address_numero":null,"address_bairro":null,"address_cidade":null,"address_uf":null,"consumo_medio":null,"taxa_iluminacao":null,"tipo_conexao":null,"summary":"Primeiro contato, cliente demonstrou interesse em energia solar.","interest_level":"Médio","tags":["energia_solar","primeiro_contato","interesse_inicial"]}
+[5567777888999] Processamento finalizado. Trava liberada.
+[554388525260] Trava ativada. Processando tipo: text
+[554388525260] Iniciando processamento da mensagem...
+[554388525260] Buscando no dossiê...
+[554388525260] Dossiê processado: não encontrado
+Usando prompt do cache.
+[554388525260] Carregando informações da planilha...
+[554388525260] Planilha carregada, acessando aba CRM...
+[554388525260] Obtendo linhas do CRM...
+[554388525260] Buscando usuário existente...
+[554388525260] Usuário encontrado: true Estágio atual: 3
+[554388525260] Fonte do lead identificada: *undefined*
+[554388525260] Obtendo histórico e dados conhecidos...
+[554388525260] Histórico carregado, tamanho: 32 Dados conhecidos: [ 'name', 'cpf', 'email' ]
+[554388525260] Estágio: 3. Processando input para IA: "Olaa"
+[554388525260] Chamando getAiResponse...
+[DEBUG] Iniciando getAiResponse...
+[DEBUG] SystemPrompt length: 7255
+[DEBUG] Chat iniciado com sucesso
+[DEBUG] Enviando mensagem para IA...
+[DEBUG] Resposta recebida da IA
+Resposta bruta do Gemini: ```json
+{
+  "response_message": "Olá!  Para elaborarmos uma solução personalizada de economia de energia para você, preciso analisar sua última fatura.  Você teria como me enviar uma foto dela?",
+  "next_stage": 3,
+  "name": null,
+  "cpf": null,
+  "email": null,
+  "address_logradouro": null,
+  "address_numero": null,
+  "address_bairro": null,
+  "address_cidade": null,
+  "address_uf": null,
+  "consumo_medio": null,
+  "taxa_iluminacao": null,
+  "tipo_conexao": null,
+  "summary": "Solicitação da fatura de energia para análise.",
+  "interest_level": 3,
+  "tags": ["fatura", "análise", "consumo"]
+}
+```
+
+[554388525260] getAiResponse retornou: {"response_message":"Olá!  Para elaborarmos uma solução personalizada de economia de energia para você, preciso analisar sua última fatura.  Você teria como me enviar uma foto dela?","next_stage":3,"name":null,"cpf":null,"email":null,"address_logradouro":null,"address_numero":null,"address_bairro":null,"address_cidade":null,"address_uf":null,"consumo_medio":null,"taxa_iluminacao":null,"tipo_conexao":null,"summary":"Solicitação da fatura de energia para análise.","interest_level":3,"tags":["fatura","análise","consumo"]}
+[554388525260] Processamento finalizado. Trava liberada.

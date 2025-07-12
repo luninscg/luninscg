@@ -1,0 +1,872 @@
+const express = require('express');
+const { getAllLeads, getLead, getMessages } = require('./database');
+const fs = require('fs').promises;
+
+const router = express.Router();
+
+// API de Estatísticas
+router.get('/api/stats', async (req, res) => {
+    try {
+        const leads = await getAllLeads();
+        
+        const stats = {
+            totalLeads: leads.length,
+            leadsByStage: {},
+            leadsByInterest: {},
+            leadsBySource: {},
+            conversionRate: 0,
+            recentActivity: leads.slice(0, 5).map(lead => ({
+                name: lead.name || 'N/A',
+                whatsapp: lead.whatsapp_number,
+                stage: lead.stage,
+                lastInteraction: lead.last_interaction_timestamp
+            }))
+        };
+        
+        // Estatísticas por estágio
+        leads.forEach(lead => {
+            const stage = `Estágio ${lead.stage}`;
+            stats.leadsByStage[stage] = (stats.leadsByStage[stage] || 0) + 1;
+        });
+        
+        // Estatísticas por interesse
+        leads.forEach(lead => {
+            const interest = lead.interest_level || 'Não definido';
+            stats.leadsByInterest[interest] = (stats.leadsByInterest[interest] || 0) + 1;
+        });
+        
+        // Estatísticas por fonte
+        leads.forEach(lead => {
+            const source = lead.source || 'Orgânico';
+            stats.leadsBySource[source] = (stats.leadsBySource[source] || 0) + 1;
+        });
+        
+        // Taxa de conversão (leads no estágio 5+ / total)
+        const convertedLeads = leads.filter(lead => lead.stage >= 5).length;
+        stats.conversionRate = leads.length > 0 ? ((convertedLeads / leads.length) * 100).toFixed(1) : 0;
+        
+        res.json(stats);
+    } catch (error) {
+        console.error('Error getting stats:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// API de Filtros
+router.get('/api/leads/filter', async (req, res) => {
+    try {
+        const { stage, interest, period, source } = req.query;
+        let leads = await getAllLeads();
+        
+        // Filtro por estágio
+        if (stage && stage !== 'all') {
+            leads = leads.filter(lead => lead.stage.toString() === stage);
+        }
+        
+        // Filtro por interesse
+        if (interest && interest !== 'all') {
+            leads = leads.filter(lead => lead.interest_level === interest);
+        }
+        
+        // Filtro por fonte
+        if (source && source !== 'all') {
+            leads = leads.filter(lead => (lead.source || 'Orgânico') === source);
+        }
+        
+        // Filtro por período
+        if (period && period !== 'all') {
+            const now = new Date();
+            const periodDays = {
+                '7': 7,
+                '30': 30,
+                '90': 90
+            };
+            
+            if (periodDays[period]) {
+                const cutoffDate = new Date(now.getTime() - (periodDays[period] * 24 * 60 * 60 * 1000));
+                leads = leads.filter(lead => {
+                    const lastInteraction = new Date(lead.last_interaction_timestamp);
+                    return lastInteraction >= cutoffDate;
+                });
+            }
+        }
+        
+        res.json(leads);
+    } catch (error) {
+        console.error('Error filtering leads:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Dashboard Principal
+router.get('/', async (req, res) => {
+    try {
+        const leads = await getAllLeads();
+        const systemPrompt = await fs.readFile('./prompt.js', 'utf-8');
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>CRM Dashboard Avançado - Energia A</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <style>
+                    :root {
+                        --primary-color: #2c5aa0;
+                        --secondary-color: #f8f9fa;
+                        --success-color: #28a745;
+                        --warning-color: #ffc107;
+                        --danger-color: #dc3545;
+                        --info-color: #17a2b8;
+                    }
+                    
+                    body {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        min-height: 100vh;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    }
+                    
+                    .dashboard-container {
+                        background: rgba(255, 255, 255, 0.95);
+                        border-radius: 20px;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                        backdrop-filter: blur(10px);
+                        margin: 20px;
+                        padding: 30px;
+                    }
+                    
+                    .stats-card {
+                        background: linear-gradient(135deg, var(--primary-color), #3d6bb3);
+                        color: white;
+                        border-radius: 15px;
+                        padding: 25px;
+                        margin-bottom: 20px;
+                        box-shadow: 0 10px 30px rgba(44, 90, 160, 0.3);
+                        transition: transform 0.3s ease;
+                    }
+                    
+                    .stats-card:hover {
+                        transform: translateY(-5px);
+                    }
+                    
+                    .stats-number {
+                        font-size: 2.5rem;
+                        font-weight: bold;
+                        margin-bottom: 10px;
+                    }
+                    
+                    .stats-label {
+                        font-size: 1.1rem;
+                        opacity: 0.9;
+                    }
+                    
+                    .filters {
+                        background: white;
+                        border-radius: 15px;
+                        padding: 25px;
+                        margin-bottom: 30px;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                    }
+                    
+                    .filter-group {
+                        margin-bottom: 20px;
+                    }
+                    
+                    .filter-group label {
+                        font-weight: 600;
+                        color: var(--primary-color);
+                        margin-bottom: 8px;
+                        display: block;
+                    }
+                    
+                    .filter-group select {
+                        border: 2px solid #e9ecef;
+                        border-radius: 10px;
+                        padding: 10px 15px;
+                        transition: border-color 0.3s ease;
+                    }
+                    
+                    .filter-group select:focus {
+                        border-color: var(--primary-color);
+                        box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+                    }
+                    
+                    .leads-table {
+                        background: white;
+                        border-radius: 15px;
+                        overflow: hidden;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                    }
+                    
+                    .table th {
+                        background: var(--primary-color);
+                        color: white;
+                        border: none;
+                        padding: 15px;
+                        font-weight: 600;
+                    }
+                    
+                    .table td {
+                        padding: 15px;
+                        vertical-align: middle;
+                        border-color: #f8f9fa;
+                    }
+                    
+                    .stage-badge {
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                    }
+                    
+                    .interest-badge {
+                        padding: 4px 8px;
+                        border-radius: 15px;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                    }
+                    
+                    .btn-action {
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-size: 0.9rem;
+                        font-weight: 500;
+                        text-decoration: none;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .btn-action:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    }
+                    
+                    .chart-container {
+                        background: white;
+                        border-radius: 15px;
+                        padding: 25px;
+                        margin-bottom: 30px;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                    }
+                    
+                    .loading {
+                        text-align: center;
+                        padding: 50px;
+                        color: #6c757d;
+                    }
+                    
+                    .prompt-section {
+                        background: white;
+                        border-radius: 15px;
+                        padding: 25px;
+                        margin-top: 30px;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                    }
+                    
+                    .prompt-textarea {
+                        border: 2px solid #e9ecef;
+                        border-radius: 10px;
+                        padding: 15px;
+                        font-family: 'Courier New', monospace;
+                        font-size: 0.9rem;
+                        transition: border-color 0.3s ease;
+                    }
+                    
+                    .prompt-textarea:focus {
+                        border-color: var(--primary-color);
+                        box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="dashboard-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="display-4 fw-bold text-primary">
+                            <i class="fas fa-chart-line me-3"></i>CRM Dashboard
+                        </h1>
+                        <div class="text-muted">
+                            <i class="fas fa-clock me-2"></i>
+                            <span id="current-time"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Estatísticas -->
+                    <div class="row mb-4" id="stats-container">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="total-leads">-</div>
+                                <div class="stats-label">
+                                    <i class="fas fa-users me-2"></i>Total de Leads
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, var(--success-color), #34ce57);">
+                                <div class="stats-number" id="conversion-rate">-</div>
+                                <div class="stats-label">
+                                    <i class="fas fa-chart-line me-2"></i>Taxa de Conversão
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, var(--warning-color), #ffcd39);">
+                                <div class="stats-number" id="active-leads">-</div>
+                                <div class="stats-label">
+                                    <i class="fas fa-fire me-2"></i>Leads Ativos
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card" style="background: linear-gradient(135deg, var(--info-color), #20c9e7);">
+                                <div class="stats-number" id="qualified-leads">-</div>
+                                <div class="stats-label">
+                                    <i class="fas fa-star me-2"></i>Leads Qualificados
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráficos -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5 class="mb-3"><i class="fas fa-chart-pie me-2"></i>Leads por Estágio</h5>
+                                <canvas id="stageChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h5 class="mb-3"><i class="fas fa-chart-bar me-2"></i>Leads por Interesse</h5>
+                                <canvas id="interestChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtros -->
+                    <div class="filters">
+                        <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filtros</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="filter-group">
+                                    <label for="filter-stage">Estágio</label>
+                                    <select class="form-select" id="filter-stage">
+                                        <option value="all">Todos os Estágios</option>
+                                        <option value="0">Estágio 0 - Inicial</option>
+                                        <option value="1">Estágio 1 - Contato</option>
+                                        <option value="2">Estágio 2 - Interesse</option>
+                                        <option value="3">Estágio 3 - Qualificação</option>
+                                        <option value="4">Estágio 4 - Proposta</option>
+                                        <option value="5">Estágio 5 - Negociação</option>
+                                        <option value="6">Estágio 6 - Fechamento</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="filter-group">
+                                    <label for="filter-interest">Interesse</label>
+                                    <select class="form-select" id="filter-interest">
+                                        <option value="all">Todos os Níveis</option>
+                                        <option value="Alto">Alto</option>
+                                        <option value="Médio">Médio</option>
+                                        <option value="Baixo">Baixo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="filter-group">
+                                    <label for="filter-period">Período</label>
+                                    <select class="form-select" id="filter-period">
+                                        <option value="all">Todos os Períodos</option>
+                                        <option value="7">Últimos 7 dias</option>
+                                        <option value="30">Últimos 30 dias</option>
+                                        <option value="90">Últimos 90 dias</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="filter-group">
+                                    <label for="filter-source">Fonte</label>
+                                    <select class="form-select" id="filter-source">
+                                        <option value="all">Todas as Fontes</option>
+                                        <option value="Orgânico">Orgânico</option>
+                                        <option value="Facebook">Facebook</option>
+                                        <option value="Google">Google</option>
+                                        <option value="Instagram">Instagram</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button class="btn btn-primary me-2" onclick="applyFilters()">
+                                    <i class="fas fa-search me-2"></i>Aplicar Filtros
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-2"></i>Limpar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabela de Leads -->
+                    <div class="leads-table">
+                        <h5 class="p-3 mb-0 bg-primary text-white">
+                            <i class="fas fa-table me-2"></i>Lista de Leads
+                            <span class="badge bg-light text-primary ms-2" id="leads-count">0</span>
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="leads-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>WhatsApp</th>
+                                        <th>Estágio</th>
+                                        <th>Interesse</th>
+                                        <th>Fonte</th>
+                                        <th>Última Interação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leads-tbody">
+                                    <tr>
+                                        <td colspan="7" class="loading">
+                                            <i class="fas fa-spinner fa-spin me-2"></i>Carregando leads...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção do Prompt -->
+                    <div class="prompt-section">
+                        <h5 class="mb-3"><i class="fas fa-code me-2"></i>System Prompt</h5>
+                        <form action="/dashboard/prompt" method="post">
+                            <textarea name="prompt" class="form-control prompt-textarea" rows="10">${systemPrompt}</textarea>
+                            <button type="submit" class="btn btn-success mt-3">
+                                <i class="fas fa-save me-2"></i>Salvar Prompt
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    let stageChart, interestChart;
+                    
+                    // Atualizar horário
+                    function updateTime() {
+                        const now = new Date();
+                        document.getElementById('current-time').textContent = now.toLocaleString('pt-BR');
+                    }
+                    
+                    // Carregar estatísticas
+                    async function loadStats() {
+                        try {
+                            const response = await fetch('/dashboard/api/stats');
+                            const stats = await response.json();
+                            
+                            document.getElementById('total-leads').textContent = stats.totalLeads;
+                            document.getElementById('conversion-rate').textContent = stats.conversionRate + '%';
+                            
+                            // Calcular leads ativos (estágios 1-4)
+                            const activeLeads = Object.entries(stats.leadsByStage)
+                                .filter(([stage]) => ['Estágio 1', 'Estágio 2', 'Estágio 3', 'Estágio 4'].includes(stage))
+                                .reduce((sum, [, count]) => sum + count, 0);
+                            document.getElementById('active-leads').textContent = activeLeads;
+                            
+                            // Calcular leads qualificados (estágio 5+)
+                            const qualifiedLeads = Object.entries(stats.leadsByStage)
+                                .filter(([stage]) => ['Estágio 5', 'Estágio 6', 'Estágio 7', 'Estágio 8'].includes(stage))
+                                .reduce((sum, [, count]) => sum + count, 0);
+                            document.getElementById('qualified-leads').textContent = qualifiedLeads;
+                            
+                            // Atualizar gráficos
+                            updateCharts(stats);
+                        } catch (error) {
+                            console.error('Erro ao carregar estatísticas:', error);
+                        }
+                    }
+                    
+                    // Atualizar gráficos
+                    function updateCharts(stats) {
+                        // Gráfico de estágios
+                        const stageCtx = document.getElementById('stageChart').getContext('2d');
+                        if (stageChart) stageChart.destroy();
+                        
+                        stageChart = new Chart(stageCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: Object.keys(stats.leadsByStage),
+                                datasets: [{
+                                    data: Object.values(stats.leadsByStage),
+                                    backgroundColor: [
+                                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                                        '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+                                    ]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom'
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Gráfico de interesse
+                        const interestCtx = document.getElementById('interestChart').getContext('2d');
+                        if (interestChart) interestChart.destroy();
+                        
+                        interestChart = new Chart(interestCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(stats.leadsByInterest),
+                                datasets: [{
+                                    label: 'Número de Leads',
+                                    data: Object.values(stats.leadsByInterest),
+                                    backgroundColor: '#36A2EB',
+                                    borderColor: '#2C5AA0',
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Carregar leads
+                    async function loadLeads(filters = {}) {
+                        try {
+                            const params = new URLSearchParams(filters);
+                            const response = await fetch('/dashboard/api/leads/filter?' + params);
+                            const leads = await response.json();
+                            
+                            const tbody = document.getElementById('leads-tbody');
+                            document.getElementById('leads-count').textContent = leads.length;
+                            
+                            // Around line 560-570
+                            if (leads.length === 0) {
+                                tbody.innerHTML = `
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            <i class="fas fa-search me-2"></i>Nenhum lead encontrado
+                                        </td>
+                                    </tr>
+                                `;
+                                return;
+                            }
+                            
+                            tbody.innerHTML = leads.map(lead => {
+                                const stageBadge = getStageBadge(lead.stage);
+                                const interestBadge = getInterestBadge(lead.interest_level);
+                                const lastInteraction = new Date(lead.last_interaction_timestamp).toLocaleString('pt-BR');
+                                // Fix: Use string concatenation instead of nested template literals
+                                const cpfDisplay = lead.cpf ? '<br><small class="text-muted">CPF: ' + lead.cpf + '</small>' : '';
+                                
+                                // Usar a variável no template principal
+                                return `
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>${lead.name || 'N/A'}</strong>
+                                            </div>
+                                            ${cpfDisplay}
+                                        </td>
+                                        <td>
+                                            <a href="https://wa.me/${lead.whatsapp_number}" target="_blank" class="text-decoration-none">
+                                                <i class="fab fa-whatsapp text-success me-1"></i>
+                                                ${lead.whatsapp_number}
+                                            </a>
+                                        </td>
+                                        <td>${stageBadge}</td>
+                                        <td>${interestBadge}</td>
+                                        <td>
+                                            <span class="badge bg-secondary">${lead.source || 'Orgânico'}</span>
+                                        </td>
+                                        <td>
+                                            <small>${lastInteraction}</small>
+                                        </td>
+                                        <td>
+                                            <a href="/dashboard/lead/${lead.whatsapp_number}" class="btn btn-sm btn-primary btn-action">
+                                                <i class="fas fa-eye me-1"></i>Ver
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('');
+                        } catch (error) {
+                            console.error('Erro ao carregar leads:', error);
+                            document.getElementById('leads-tbody').innerHTML = `
+                                <tr>
+                                    <td colspan="7" class="text-center text-danger py-4">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Erro ao carregar leads
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    }
+                    
+                    // Obter badge do estágio
+                    function getStageBadge(stage) {
+                        const stages = {
+                            0: { text: 'Inicial', class: 'bg-secondary' },
+                            1: { text: 'Contato', class: 'bg-info' },
+                            2: { text: 'Interesse', class: 'bg-primary' },
+                            3: { text: 'Qualificação', class: 'bg-warning' },
+                            4: { text: 'Proposta', class: 'bg-warning' },
+                            5: { text: 'Negociação', class: 'bg-success' },
+                            6: { text: 'Fechamento', class: 'bg-success' },
+                            7: { text: 'Finalizado', class: 'bg-dark' },
+                            8: { text: 'Perdido', class: 'bg-danger' }
+                        };
+                        
+                        const stageInfo = stages[stage] || { text: 'Estágio ' + stage, class: 'bg-secondary' };
+                        return '<span class="badge ' + stageInfo.class + ' stage-badge">' + stageInfo.text + '</span>';
+                    }
+                    
+                    // Obter badge do interesse
+                    function getInterestBadge(interest) {
+                        if (!interest || interest === 'N/A') {
+                            return '<span class="badge bg-light text-dark interest-badge">N/A</span>';
+                        }
+                        
+                        const classes = {
+                            'Alto': 'bg-success',
+                            'Médio': 'bg-warning',
+                            'Baixo': 'bg-danger'
+                        };
+                        
+                        const badgeClass = classes[interest] || 'bg-secondary';
+                        return '<span class="badge ' + badgeClass + ' interest-badge">' + interest + '</span>';
+                    }
+                    
+                    // Aplicar filtros
+                    function applyFilters() {
+                        const filters = {
+                            stage: document.getElementById('filter-stage').value,
+                            interest: document.getElementById('filter-interest').value,
+                            period: document.getElementById('filter-period').value,
+                            source: document.getElementById('filter-source').value
+                        };
+                        
+                        // Remover filtros 'all'
+                        Object.keys(filters).forEach(key => {
+                            if (filters[key] === 'all') {
+                                delete filters[key];
+                            }
+                        });
+                        
+                        loadLeads(filters);
+                    }
+                    
+                    // Limpar filtros
+                    function clearFilters() {
+                        document.getElementById('filter-stage').value = 'all';
+                        document.getElementById('filter-interest').value = 'all';
+                        document.getElementById('filter-period').value = 'all';
+                        document.getElementById('filter-source').value = 'all';
+                        loadLeads();
+                    }
+                    
+                    // Inicialização
+                    document.addEventListener('DOMContentLoaded', function() {
+                        updateTime();
+                        setInterval(updateTime, 1000);
+                        loadStats();
+                        loadLeads();
+                        
+                        // Auto-refresh a cada 30 segundos
+                        setInterval(() => {
+                            loadStats();
+                            applyFilters();
+                        }, 30000);
+                    });
+                </script>
+            </body>
+            </html>
+        `);
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// Rota para detalhes do lead (mantida)
+router.get('/lead/:whatsapp', async (req, res) => {
+    try {
+        const whatsappNumber = req.params.whatsapp;
+        const lead = await getLead(whatsappNumber);
+        const messages = await getMessages(whatsappNumber);
+
+        if (!lead) {
+            return res.status(404).send('Lead não encontrado');
+        }
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Detalhes do Lead - ${lead.name || lead.whatsapp_number}</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <style>
+                    body {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        min-height: 100vh;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    }
+                    
+                    .container {
+                        background: rgba(255, 255, 255, 0.95);
+                        border-radius: 20px;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                        backdrop-filter: blur(10px);
+                        margin: 20px auto;
+                        padding: 30px;
+                    }
+                    
+                    .chat-history {
+                        background: #f8f9fa;
+                        border-radius: 15px;
+                        padding: 20px;
+                        max-height: 600px;
+                        overflow-y: auto;
+                    }
+                    
+                    .message {
+                        margin-bottom: 15px;
+                        padding: 15px;
+                        border-radius: 15px;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    }
+                    
+                    .user {
+                        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+                        margin-left: 20px;
+                    }
+                    
+                    .agent {
+                        background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+                        margin-right: 20px;
+                    }
+                    
+                    .timestamp {
+                        font-size: 0.8rem;
+                        color: #6c757d;
+                        margin-top: 8px;
+                    }
+                    
+                    .lead-info {
+                        background: white;
+                        border-radius: 15px;
+                        padding: 25px;
+                        margin-bottom: 30px;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="display-5 fw-bold text-primary">
+                            <a href="/dashboard" class="text-decoration-none">
+                                <i class="fas fa-arrow-left me-3"></i>
+                            </a>
+                            Detalhes do Lead
+                        </h1>
+                    </div>
+                    
+                    <div class="lead-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="text-primary">
+                                    <i class="fas fa-user me-2"></i>
+                                    ${lead.name || 'Nome não informado'}
+                                </h3>
+                                <p class="mb-2">
+                                    <strong><i class="fab fa-whatsapp text-success me-2"></i>WhatsApp:</strong>
+                                    <a href="https://wa.me/${lead.whatsapp_number}" target="_blank" class="text-decoration-none">
+                                        ${lead.whatsapp_number}
+                                    </a>
+                                 </p>
+                                ${lead.cpf ? '<p class="mb-2"><strong><i class="fas fa-id-card me-2"></i>CPF:</strong> ' + lead.cpf + '</p>' : ''}
+                                ${lead.email ? '<p class="mb-2"><strong><i class="fas fa-envelope me-2"></i>Email:</strong> ' + lead.email + '</p>' : ''}
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-chart-line me-2"></i>Estágio:</strong>
+                                    <span class="badge bg-primary">${lead.stage}</span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-heart me-2"></i>Interesse:</strong>
+                                    <span class="badge bg-success">${lead.interest_level || 'N/A'}</span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-source me-2"></i>Fonte:</strong>
+                                    <span class="badge bg-secondary">${lead.source || 'Orgânico'}</span>
+                                </p>
+                                ${lead.summary ? '<p class="mb-2"><strong><i class="fas fa-notes-medical me-2"></i>Resumo:</strong> ' + lead.summary + '</p>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-3">
+                        <i class="fas fa-comments me-2"></i>Histórico da Conversa
+                        <span class="badge bg-primary ms-2">${messages.length} mensagens</span>
+                    </h4>
+                    
+                    <div class="chat-history">
+                        ${messages.length > 0 ? messages.map(msg => `
+                            <div class="message ${msg.sender}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <strong class="text-primary">
+                                        <i class="fas ${msg.sender === 'user' ? 'fa-user' : 'fa-robot'} me-2"></i>
+                                        ${msg.sender === 'user' ? 'Cliente' : 'Agente IA'}
+                                    </strong>
+                                    <small class="text-muted">${new Date(msg.timestamp).toLocaleString('pt-BR')}</small>
+                                </div>
+                                <div class="mt-2">${msg.message}</div>
+                            </div>
+                        `).join('') : '<div class="text-center text-muted py-4"><i class="fas fa-comment-slash me-2"></i>Nenhuma mensagem encontrada</div>'}
+                    </div>
+                </div>
+                
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            </body>
+            </html>
+        `);
+    } catch (error) {
+        console.error('Error loading lead details:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// Rota para salvar prompt (mantida)
+router.post('/prompt', async (req, res) => {
+    try {
+        const newPrompt = req.body.prompt;
+        await fs.writeFile('./prompt.js', newPrompt, 'utf-8');
+        res.redirect('/dashboard');
+    } catch (error) {
+        console.error('Error updating prompt:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+module.exports = router;

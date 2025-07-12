@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do Chat Bot - Gabriel IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .message.bot .message-content {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            background: #4CAF50;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .message-input:focus {
+            border-color: #4CAF50;
+        }
+
+        .send-button {
+            padding: 12px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .send-button:hover {
+            background: #45a049;
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 16px;
+            background: #e3f2fd;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            max-width: 70%;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #1565c0;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .status-indicator {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .status-indicator.connected {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-indicator.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 Gabriel IA - Teste do Chat Bot</h1>
+            <p>Converse diretamente com o assistente de vendas</p>
+        </div>
+        
+        <div class="status-indicator" id="statusIndicator">
+            Conectando ao servidor...
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-content">
+                    Olá! 👋 Sou o Gabriel, seu assistente de vendas especializado em energia solar. Como posso ajudá-lo hoje?
+                    <div class="message-time" id="botTime"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <div class="input-container">
+                <input type="text" class="message-input" id="messageInput" placeholder="Digite sua mensagem..." disabled>
+                <button class="send-button" id="sendButton" disabled>Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ChatTester {
+            constructor() {
+                this.messages = document.getElementById('chatMessages');
+                this.input = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.statusIndicator = document.getElementById('statusIndicator');
+                
+                this.testNumber = '5511999999999'; // Número de teste
+                this.serverUrl = window.location.origin;
+                
+                this.init();
+            }
+            
+            init() {
+                this.checkServerStatus();
+                this.setupEventListeners();
+                this.updateBotTime();
+            }
+            
+            async checkServerStatus() {
+                try {
+                    const response = await fetch(`${this.serverUrl}/health`);
+                    if (response.ok) {
+                        this.setStatus('connected', '✅ Conectado ao servidor');
+                        this.enableChat();
+                    } else {
+                        throw new Error('Servidor não disponível');
+                    }
+                } catch (error) {
+                    this.setStatus('error', '❌ Erro de conexão com o servidor');
+                    console.error('Erro ao conectar:', error);
+                }
+            }
+            
+            setStatus(type, message) {
+                this.statusIndicator.className = `status-indicator ${type}`;
+                this.statusIndicator.textContent = message;
+            }
+            
+            enableChat() {
+                this.input.disabled = false;
+                this.sendButton.disabled = false;
+                this.input.focus();
+            }
+            
+            setupEventListeners() {
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+            }
+            
+            async sendMessage() {
+                const message = this.input.value.trim();
+                if (!message) return;
+                
+                // Adicionar mensagem do usuário
+                this.addMessage('user', message);
+                this.input.value = '';
+                this.input.disabled = true;
+                this.sendButton.disabled = true;
+                
+                // Mostrar indicador de digitação
+                this.showTyping();
+                
+                try {
+                    // Simular envio para o webhook
+                    const webhookData = {
+                        key: this.testNumber,
+                        message: {
+                            conversation: this.testNumber,
+                            pushName: 'Usuário Teste',
+                            message: {
+                                extendedTextMessage: {
+                                    text: message
+                                }
+                            }
+                        }
+                    };
+                    
+                    const response = await fetch(`${this.serverUrl}/webhook`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(webhookData)
+                    });
+                    
+                    if (response.ok) {
+                        // Aguardar um pouco para simular processamento
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
+                        // Buscar a resposta do bot
+                        await this.getBotResponse();
+                    } else {
+                        throw new Error('Erro ao enviar mensagem');
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    this.addMessage('bot', 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.');
+                } finally {
+                    this.hideTyping();
+                    this.input.disabled = false;
+                    this.sendButton.disabled = false;
+                    this.input.focus();
+                }
+            }
+            
+            async getBotResponse() {
+                try {
+                    // Buscar mensagens do lead de teste
+                    const response = await fetch(`${this.serverUrl}/api/messages/${this.testNumber}`);
+                    if (response.ok) {
+                        const messages = await response.json();
+                        const lastBotMessage = messages
+                            .filter(msg => msg.sender === 'bot')
+                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+                        
+                        if (lastBotMessage) {
+                            this.addMessage('bot', lastBotMessage.message);
+                        } else {
+                            this.addMessage('bot', 'Recebi sua mensagem! Como posso ajudá-lo?');
+                        }
+                    } else {
+                        this.addMessage('bot', 'Recebi sua mensagem! Como posso ajudá-lo?');
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar resposta:', error);
+                    this.addMessage('bot', 'Recebi sua mensagem! Como posso ajudá-lo?');
+                }
+            }
+            
+            addMessage(sender, text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const time = new Date().toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${text}
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+                
+                this.messages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            showTyping() {
+                this.typingIndicator.style.display = 'block';
+                this.scrollToBottom();
+            }
+            
+            hideTyping() {
+                this.typingIndicator.style.display = 'none';
+            }
+            
+            scrollToBottom() {
+                this.messages.scrollTop = this.messages.scrollHeight;
+            }
+            
+            updateBotTime() {
+                const timeElement = document.getElementById('botTime');
+                if (timeElement) {
+                    timeElement.textContent = new Date().toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            }
+        }
+        
+        // Inicializar o chat quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            new ChatTester();
+        });
+    </script>
+</body>
+</html>

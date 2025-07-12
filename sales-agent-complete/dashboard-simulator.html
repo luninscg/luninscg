@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel Humano 2.0 - Simulação Massiva</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 5px solid #007bff;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .controls h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-item label {
+            color: #495057;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .control-item input, .control-item select {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,193,7,0.3);
+        }
+
+        .results {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .results h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            background: #dee2e6;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .recommendations {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .recommendations h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .recommendation-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .recommendation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .priority-high {
+            border-left-color: #dc3545;
+        }
+
+        .priority-medium {
+            border-left-color: #ffc107;
+        }
+
+        .priority-low {
+            border-left-color: #28a745;
+        }
+
+        @media (max-width: 768px) {
+            .control-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Gabriel Humano 2.0</h1>
+            <p>Sistema de Simulação Massiva e Otimização Contínua</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Estatísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalSimulations">0</h3>
+                    <p>Simulações Executadas</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="avgAccuracy">0%</h3>
+                    <p>Precisão Média</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="avgNaturalness">0%</h3>
+                    <p>Naturalidade Média</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalOptimizations">0</h3>
+                    <p>Otimizações Aplicadas</p>
+                </div>
+            </div>
+
+            <!-- Controles -->
+            <div class="controls">
+                <h2>⚙️ Configurações de Simulação</h2>
+                
+                <div class="control-group">
+                    <div class="control-item">
+                        <label for="personalityIterations">Iterações - Personalidade:</label>
+                        <input type="number" id="personalityIterations" value="1000" min="100" max="10000">
+                    </div>
+                    <div class="control-item">
+                        <label for="campaignIterations">Iterações - Campanhas:</label>
+                        <input type="number" id="campaignIterations" value="500" min="50" max="5000">
+                    </div>
+                    <div class="control-item">
+                        <label for="antiRoboticIterations">Iterações - Anti-Robótico:</label>
+                        <input type="number" id="antiRoboticIterations" value="200" min="20" max="2000">
+                    </div>
+                    <div class="control-item">
+                        <label for="simulationMode">Modo de Simulação:</label>
+                        <select id="simulationMode">
+                            <option value="full">Completa</option>
+                            <option value="personality">Apenas Personalidade</option>
+                            <option value="campaigns">Apenas Campanhas</option>
+                            <option value="antiRobotic">Apenas Anti-Robótico</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" onclick="startSimulation()">🚀 Iniciar Simulação</button>
+                    <button class="btn btn-success" onclick="analyzePatterns()">🔍 Analisar Padrões</button>
+                    <button class="btn btn-warning" onclick="optimizePrompts()">⚡ Otimizar Prompts</button>
+                    <button class="btn btn-primary" onclick="viewHistory()">📊 Ver Histórico</button>
+                </div>
+            </div>
+
+            <!-- Progresso -->
+            <div class="progress-container" id="progressContainer">
+                <h3>Progresso da Simulação</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="progressText">Preparando simulação...</p>
+            </div>
+
+            <!-- Resultados -->
+            <div class="results">
+                <h2>📈 Resultados e Logs</h2>
+                <div class="log" id="logContainer">
+                    Sistema pronto para simulação massiva.\n\n🎯 Configuração atual:\n- Personalidade: 1000 iterações\n- Campanhas: 500 iterações\n- Anti-Robótico: 200 iterações\n\nClique em "Iniciar Simulação" para começar.
+                </div>
+
+                <!-- Recomendações -->
+                <div class="recommendations" id="recommendationsContainer" style="display: none;">
+                    <h3>💡 Recomendações de Otimização</h3>
+                    <div id="recommendationsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSimulation = null;
+        let simulationStats = {
+            totalSimulations: 0,
+            avgAccuracy: 0,
+            avgNaturalness: 0,
+            totalOptimizations: 0
+        };
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            updateStatsDisplay();
+        });
+
+        // Carregar estatísticas
+        function loadStats() {
+            // Aqui você carregaria as estatísticas do servidor
+            // Por enquanto, usando dados mock
+            simulationStats = {
+                totalSimulations: 15,
+                avgAccuracy: 87.5,
+                avgNaturalness: 82.3,
+                totalOptimizations: 23
+            };
+        }
+
+        // Atualizar display das estatísticas
+        function updateStatsDisplay() {
+            document.getElementById('totalSimulations').textContent = simulationStats.totalSimulations;
+            document.getElementById('avgAccuracy').textContent = simulationStats.avgAccuracy.toFixed(1) + '%';
+            document.getElementById('avgNaturalness').textContent = simulationStats.avgNaturalness.toFixed(1) + '%';
+            document.getElementById('totalOptimizations').textContent = simulationStats.totalOptimizations;
+        }
+
+        // Iniciar simulação
+        async function startSimulation() {
+            const config = {
+                personalityIterations: parseInt(document.getElementById('personalityIterations').value),
+                campaignIterations: parseInt(document.getElementById('campaignIterations').value),
+                antiRoboticIterations: parseInt(document.getElementById('antiRoboticIterations').value),
+                mode: document.getElementById('simulationMode').value
+            };
+
+            showProgress();
+            logMessage('🚀 Iniciando simulação massiva...\n');
+            logMessage(`📊 Configuração: ${JSON.stringify(config, null, 2)}\n`);
+
+            try {
+                // Simular progresso
+                await simulateProgress();
+                
+                // Aqui você faria a chamada real para o servidor
+                // const response = await fetch('/api/simulate', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(config)
+                // });
+                
+                // Mock de resultados
+                const results = await mockSimulation(config);
+                
+                logMessage('✅ Simulação concluída com sucesso!\n');
+                logMessage(`📈 Resultados: ${JSON.stringify(results, null, 2)}\n`);
+                
+                // Atualizar estatísticas
+                simulationStats.totalSimulations++;
+                simulationStats.avgAccuracy = results.avgAccuracy;
+                simulationStats.avgNaturalness = results.avgNaturalness;
+                updateStatsDisplay();
+                
+                hideProgress();
+                
+            } catch (error) {
+                logMessage(`❌ Erro na simulação: ${error.message}\n`);
+                hideProgress();
+            }
+        }
+
+        // Analisar padrões
+        async function analyzePatterns() {
+            logMessage('🔍 Analisando padrões dos resultados...\n');
+            
+            // Mock de análise
+            setTimeout(() => {
+                logMessage('📊 Análise de padrões concluída:\n');
+                logMessage('- Personalidade Analítica: 92% precisão\n');
+                logMessage('- Personalidade Expressiva: 78% precisão (⚠️ baixa)\n');
+                logMessage('- Campanhas manhã: 95% naturalidade\n');
+                logMessage('- Campanhas tarde: 85% naturalidade\n');
+                logMessage('- Anti-robótico: 45 variações médias\n\n');
+                
+                showRecommendations([
+                    { type: 'personality', priority: 'high', message: 'Melhorar detecção de personalidade Expressiva (78% precisão)' },
+                    { type: 'campaign', priority: 'medium', message: 'Aumentar naturalidade das campanhas da tarde (85%)' },
+                    { type: 'antiRobotic', priority: 'medium', message: 'Aumentar variações anti-robóticas (45 variações médias)' }
+                ]);
+            }, 2000);
+        }
+
+        // Otimizar prompts
+        async function optimizePrompts() {
+            logMessage('⚡ Iniciando otimização de prompts...\n');
+            
+            // Mock de otimização
+            setTimeout(() => {
+                logMessage('🚀 Otimização concluída:\n');
+                logMessage('- 3 prompts de personalidade otimizados\n');
+                logMessage('- 2 prompts de campanha atualizados\n');
+                logMessage('- 1 prompt anti-robótico melhorado\n');
+                logMessage('✅ 6 otimizações aplicadas com sucesso!\n\n');
+                
+                simulationStats.totalOptimizations += 6;
+                updateStatsDisplay();
+            }, 3000);
+        }
+
+        // Ver histórico
+        function viewHistory() {
+            logMessage('📊 Carregando histórico de simulações...\n');
+            logMessage('\n=== HISTÓRICO DE SIMULAÇÕES ===\n');
+            logMessage('2024-01-15 14:30 - Simulação #15 - 87.5% precisão\n');
+            logMessage('2024-01-15 12:15 - Simulação #14 - 85.2% precisão\n');
+            logMessage('2024-01-15 10:00 - Simulação #13 - 89.1% precisão\n');
+            logMessage('2024-01-14 16:45 - Simulação #12 - 84.7% precisão\n');
+            logMessage('2024-01-14 14:20 - Simulação #11 - 86.3% precisão\n\n');
+        }
+
+        // Simular progresso
+        async function simulateProgress() {
+            const steps = [
+                'Inicializando sistemas...',
+                'Carregando cenários de personalidade...',
+                'Executando simulações de personalidade...',
+                'Carregando cenários de campanha...',
+                'Executando simulações de campanha...',
+                'Carregando cenários anti-robóticos...',
+                'Executando simulações anti-robóticas...',
+                'Coletando métricas...',
+                'Finalizando simulação...'
+            ];
+
+            for (let i = 0; i < steps.length; i++) {
+                updateProgress((i + 1) / steps.length * 100, steps[i]);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        // Mock de simulação
+        async function mockSimulation(config) {
+            return {
+                avgAccuracy: 85 + Math.random() * 10,
+                avgNaturalness: 80 + Math.random() * 15,
+                totalTests: config.personalityIterations + config.campaignIterations + config.antiRoboticIterations,
+                duration: '2.5 minutos'
+            };
+        }
+
+        // Mostrar progresso
+        function showProgress() {
+            document.getElementById('progressContainer').style.display = 'block';
+        }
+
+        // Esconder progresso
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+
+        // Atualizar progresso
+        function updateProgress(percentage, text) {
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+
+        // Adicionar mensagem ao log
+        function logMessage(message) {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.textContent += message;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Mostrar recomendações
+        function showRecommendations(recommendations) {
+            const container = document.getElementById('recommendationsContainer');
+            const list = document.getElementById('recommendationsList');
+            
+            list.innerHTML = '';
+            
+            recommendations.forEach(rec => {
+                const item = document.createElement('div');
+                item.className = `recommendation-item priority-${rec.priority}`;
+                item.innerHTML = `
+                    <strong>${rec.type.toUpperCase()}</strong> - ${rec.priority.toUpperCase()}<br>
+                    ${rec.message}
+                `;
+                list.appendChild(item);
+            });
+            
+            container.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
