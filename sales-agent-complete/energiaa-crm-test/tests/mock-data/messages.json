@@ -1,0 +1,20 @@
+[
+  {
+    "from": "+5511999999999",
+    "body": "Olá, gostaria de saber mais sobre energia solar",
+    "timestamp": "2025-07-13T01:31:19.581Z",
+    "type": "text"
+  },
+  {
+    "from": "+5511888888888",
+    "body": "Preciso de um orçamento para minha empresa",
+    "timestamp": "2025-07-13T01:31:19.581Z",
+    "type": "text"
+  },
+  {
+    "from": "+5511777777777",
+    "body": "Quanto custa para instalar painéis solares?",
+    "timestamp": "2025-07-13T01:31:19.581Z",
+    "type": "text"
+  }
+]

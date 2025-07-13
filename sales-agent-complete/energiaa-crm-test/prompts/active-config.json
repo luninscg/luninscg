@@ -1,0 +1,32 @@
+{
+  "lead-qualification": {
+    "id": "lead-qualification_1752365088970",
+    "version": "1.0",
+    "active": true,
+    "filePath": "/home/lunins/trae/luninscg/sales-agent-complete/energiaa-crm-test/prompts/templates/lead-qualification_1752365088970.json"
+  },
+  "whatsapp-response": {
+    "id": "whatsapp-response_1752365088972",
+    "version": "1.0",
+    "active": true,
+    "filePath": "/home/lunins/trae/luninscg/sales-agent-complete/energiaa-crm-test/prompts/templates/whatsapp-response_1752365088972.json"
+  },
+  "intent-classification": {
+    "id": "intent-classification_1752365088974",
+    "version": "1.0",
+    "active": true,
+    "filePath": "/home/lunins/trae/luninscg/sales-agent-complete/energiaa-crm-test/prompts/templates/intent-classification_1752365088974.json"
+  },
+  "sentiment-analysis": {
+    "id": "sentiment-analysis_1752365088975",
+    "version": "1.0",
+    "active": true,
+    "filePath": "/home/lunins/trae/luninscg/sales-agent-complete/energiaa-crm-test/prompts/templates/sentiment-analysis_1752365088975.json"
+  },
+  "lead-scoring": {
+    "id": "lead-scoring_1752365088976",
+    "version": "1.0",
+    "active": true,
+    "filePath": "/home/lunins/trae/luninscg/sales-agent-complete/energiaa-crm-test/prompts/templates/lead-scoring_1752365088976.json"
+  }
+}

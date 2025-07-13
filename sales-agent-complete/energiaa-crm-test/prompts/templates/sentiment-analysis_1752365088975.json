@@ -1,0 +1,22 @@
+{
+  "id": "sentiment-analysis_1752365088975",
+  "category": "sentiment-analysis",
+  "name": "Análise de Sentimento",
+  "description": "Prompt para análise de sentimento de mensagens",
+  "version": "1.0",
+  "template": "Analise o sentimento da mensagem do cliente:\n\nMensagem: \"{mensagem}\"\n\nClassifique em:\n- POSITIVO: Cliente satisfeito, interessado, elogiando\n- NEUTRO: Mensagem informativa, sem emoção clara\n- NEGATIVO: Cliente insatisfeito, reclamando, rejeitando\n\nTambém identifique:\n- URGENCIA (Alta/Média/Baixa)\n- EMOCOES principais (máximo 3)\n- NIVEL_INTERESSE (0-100%)\n\nResponda em JSON:\n{\n  \"sentimento\": \"POSITIVO/NEUTRO/NEGATIVO\",\n  \"confianca\": 85,\n  \"urgencia\": \"Alta\",\n  \"emocoes\": [\"interesse\", \"ansiedade\"],\n  \"nivelInteresse\": 75,\n  \"observacoes\": \"Cliente demonstra interesse mas tem dúvidas\"\n}",
+  "parameters": {
+    "temperature": 0.3,
+    "max_tokens": 200,
+    "top_p": 0.9
+  },
+  "active": true,
+  "createdAt": "2025-07-13T00:04:48.975Z",
+  "metrics": {
+    "usage": 0,
+    "avgResponseTime": 0,
+    "successRate": 0,
+    "userRating": 0
+  },
+  "updatedAt": "2025-07-13T00:04:48.975Z"
+}

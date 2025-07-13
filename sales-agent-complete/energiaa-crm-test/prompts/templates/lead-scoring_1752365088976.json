@@ -1,0 +1,22 @@
+{
+  "id": "lead-scoring_1752365088976",
+  "category": "lead-scoring",
+  "name": "Pontuação de Lead",
+  "description": "Prompt para calcular score de leads",
+  "version": "1.0",
+  "template": "Calcule o score do lead (0-100) baseado nos critérios:\n\nDADOS DO LEAD:\n- Consumo: {consumo} kWh/mês\n- Valor conta: R$ {valorConta}\n- Tipo imóvel: {tipoImovel}\n- Cidade: {cidade}\n- Fonte: {fonte}\n- Interesse declarado: {interesse}\n- Tempo de resposta: {tempoResposta}\n- Engajamento: {engajamento}\n- Renda estimada: {rendaEstimada}\n\nCRITÉRIOS DE PONTUAÇÃO:\n1. Consumo energético (0-25 pontos)\n   - >1000 kWh: 25 pontos\n   - 500-1000 kWh: 20 pontos\n   - 200-500 kWh: 15 pontos\n   - 100-200 kWh: 10 pontos\n   - <100 kWh: 5 pontos\n\n2. Valor da conta (0-20 pontos)\n   - >R$500: 20 pontos\n   - R$300-500: 15 pontos\n   - R$150-300: 10 pontos\n   - <R$150: 5 pontos\n\n3. Tipo de imóvel (0-15 pontos)\n   - Casa própria: 15 pontos\n   - Casa alugada: 10 pontos\n   - Apartamento: 8 pontos\n   - Comercial: 12 pontos\n\n4. Localização (0-10 pontos)\n   - Capital/região metropolitana: 10 pontos\n   - Interior desenvolvido: 8 pontos\n   - Interior rural: 5 pontos\n\n5. Fonte do lead (0-10 pontos)\n   - Indicação: 10 pontos\n   - Site/SEO: 8 pontos\n   - Redes sociais: 6 pontos\n   - Anúncios: 5 pontos\n\n6. Engajamento (0-10 pontos)\n   - Alto: 10 pontos\n   - Médio: 6 pontos\n   - Baixo: 3 pontos\n\n7. Interesse declarado (0-10 pontos)\n   - Muito interessado: 10 pontos\n   - Interessado: 7 pontos\n   - Pouco interessado: 4 pontos\n\nResponda em JSON com score total e breakdown por critério.",
+  "parameters": {
+    "temperature": 0.2,
+    "max_tokens": 400,
+    "top_p": 0.8
+  },
+  "active": true,
+  "createdAt": "2025-07-13T00:04:48.976Z",
+  "metrics": {
+    "usage": 0,
+    "avgResponseTime": 0,
+    "successRate": 0,
+    "userRating": 0
+  },
+  "updatedAt": "2025-07-13T00:04:48.976Z"
+}

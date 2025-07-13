@@ -1,0 +1,22 @@
+{
+  "id": "intent-classification_1752365088974",
+  "category": "intent-classification",
+  "name": "Classificação de Intenção",
+  "description": "Prompt para classificar intenções de mensagens",
+  "version": "1.0",
+  "template": "Classifique a intenção da mensagem do cliente em uma das categorias:\n\nCATEGORIAS:\n1. INTERESSE_INICIAL - Cliente demonstra interesse em energia solar\n2. SOLICITACAO_ORCAMENTO - Quer orçamento ou simulação\n3. DUVIDA_TECNICA - Pergunta sobre funcionamento, instalação\n4. DUVIDA_FINANCEIRA - Pergunta sobre preços, financiamento\n5. AGENDAMENTO - Quer agendar visita ou reunião\n6. RECLAMACAO - Tem alguma reclamação ou problema\n7. ELOGIO - Elogia o serviço ou produto\n8. CANCELAMENTO - Quer cancelar ou desistir\n9. INFORMACAO_GERAL - Busca informações gerais\n10. SPAM_IRRELEVANTE - Mensagem irrelevante ou spam\n11. SAUDACAO - Cumprimento ou saudação\n12. DESPEDIDA - Encerramento de conversa\n\nMensagem: \"{mensagem}\"\n\nContexto do cliente:\n- Status: {statusCliente}\n- Histórico: {historicoResumo}\n\nResponda apenas com a categoria (ex: INTERESSE_INICIAL) e confiança (0-100%):",
+  "parameters": {
+    "temperature": 0.2,
+    "max_tokens": 100,
+    "top_p": 0.8
+  },
+  "active": true,
+  "createdAt": "2025-07-13T00:04:48.974Z",
+  "metrics": {
+    "usage": 0,
+    "avgResponseTime": 0,
+    "successRate": 0,
+    "userRating": 0
+  },
+  "updatedAt": "2025-07-13T00:04:48.974Z"
+}

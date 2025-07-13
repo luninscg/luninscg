@@ -1,0 +1,42 @@
+[
+  {
+    "nome": "João Silva",
+    "email": "joao.silva@email.com",
+    "telefone": "+5511999999999",
+    "cpf": "123.456.789-00",
+    "endereco": {
+      "logradouro": "Rua das Flores, 123",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "01234-567"
+    },
+    "energyData": {
+      "consumoMedioKwh": 350,
+      "valorContaMensal": 280,
+      "numeroCliente": "123456789",
+      "numeroInstalacao": "987654321"
+    },
+    "fonte": "website",
+    "status": "lead"
+  },
+  {
+    "nome": "Maria Santos",
+    "email": "maria.santos@email.com",
+    "telefone": "+5511888888888",
+    "cnpj": "12.345.678/0001-90",
+    "endereco": {
+      "logradouro": "Av. Paulista, 1000",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "01310-100"
+    },
+    "energyData": {
+      "consumoMedioKwh": 1200,
+      "valorContaMensal": 850,
+      "numeroCliente": "987654321",
+      "numeroInstalacao": "123456789"
+    },
+    "fonte": "indicacao",
+    "status": "qualificado"
+  }
+]

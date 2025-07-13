@@ -1,0 +1,22 @@
+{
+  "id": "lead-qualification_1752365088970",
+  "category": "lead-qualification",
+  "name": "Qualificação de Leads",
+  "description": "Prompt para qualificar leads de energia solar",
+  "version": "1.0",
+  "template": "Você é um especialista em energia solar da Energiaa. Analise as informações do lead e determine:\n\n1. QUALIFICAÇÃO (A, B, C, D):\n   - A: Alto potencial (consumo >500kWh, renda alta, interesse imediato)\n   - B: Médio potencial (consumo 200-500kWh, renda média, interesse moderado)\n   - C: Baixo potencial (consumo 100-200kWh, renda baixa, interesse baixo)\n   - D: Desqualificado (consumo <100kWh, sem interesse, sem viabilidade)\n\n2. PRÓXIMOS PASSOS sugeridos\n3. PRIORIDADE (Alta, Média, Baixa)\n4. OBSERVAÇÕES importantes\n\nDados do lead:\n- Nome: {nome}\n- Telefone: {telefone}\n- Email: {email}\n- Consumo médio: {consumo} kWh/mês\n- Valor da conta: R$ {valorConta}\n- Cidade: {cidade}\n- Tipo de imóvel: {tipoImovel}\n- Interesse declarado: {interesse}\n- Fonte: {fonte}\n- Mensagem: {mensagem}\n\nResponda em formato JSON estruturado.",
+  "parameters": {
+    "temperature": 0.3,
+    "max_tokens": 500,
+    "top_p": 0.9
+  },
+  "active": true,
+  "createdAt": "2025-07-13T00:04:48.970Z",
+  "metrics": {
+    "usage": 0,
+    "avgResponseTime": 0,
+    "successRate": 0,
+    "userRating": 0
+  },
+  "updatedAt": "2025-07-13T00:04:48.970Z"
+}

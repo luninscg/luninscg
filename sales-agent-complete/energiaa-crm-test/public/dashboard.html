@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard Avançado - Energia A</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #f8f9fa;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin: 20px;
+            padding: 30px;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary-color), #3d6bb3);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(44, 90, 160, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .lead-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .lead-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+        }
+        
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .stage-badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        
+        .interest-high { background-color: var(--success-color) !important; }
+        .interest-medium { background-color: var(--warning-color) !important; }
+        .interest-low { background-color: var(--danger-color) !important; }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner-border {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-4 fw-bold text-primary">
+                <i class="fas fa-chart-line me-3"></i>
+                CRM Dashboard Avançado - Energia A
+            </h1>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary">
+                    <i class="fas fa-flask me-2"></i>Simulador
+                </button>
+                <button class="btn btn-outline-success">
+                    <i class="fas fa-brain me-2"></i>Análise IA
+                </button>
+            </div>
+        </div>
+        
+        <!-- Cards de Estatísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 id="total-leads" class="mb-0">73</h3>
+                            <p class="mb-0">Vendas do Mês</p>
+                            <small>Sistemas instalados</small>
+                        </div>
+                        <i class="fas fa-solar-panel fa-2x opacity-75"></i>
+                    </div>
+                    <div class="mt-2 text-success">+12% vs mês anterior</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, var(--success-color), #34ce57);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 id="active-leads" class="mb-0">190</h3>
+                            <p class="mb-0">Leads Ativos</p>
+                            <small>Potenciais clientes</small>
+                        </div>
+                        <i class="fas fa-user-check fa-2x opacity-75"></i>
+                    </div>
+                    <div class="mt-2 text-light">+8% vs mês anterior</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, var(--warning-color), #ffdb4d);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 id="conversion-rate" class="mb-0">R$ 2.1M</h3>
+                            <p class="mb-0">Receita</p>
+                            <small>Faturamento mensal</small>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                    </div>
+                    <div class="mt-2 text-success">+15% vs mês anterior</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, var(--info-color), #20c9e7);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 id="interactions-today" class="mb-0">12</h3>
+                            <p class="mb-0">Campanhas</p>
+                            <small>Ativas este mês</small>
+                        </div>
+                        <i class="fas fa-bullhorn fa-2x opacity-75"></i>
+                    </div>
+                    <div class="mt-2 text-light">+3 novas campanhas</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4 class="mb-3">
+                        <i class="fas fa-chart-pie me-2"></i>Distribuição por Estágio
+                    </h4>
+                    <div style="height: 300px;">
+                        <canvas id="stageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4 class="mb-3">
+                        <i class="fas fa-heart me-2"></i>Nível de Interesse
+                    </h4>
+                    <div style="height: 300px;">
+                        <canvas id="interestChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ações Rápidas -->
+        <div class="filter-section">
+            <h4 class="mb-3">
+                <i class="fas fa-bolt me-2"></i>Ações Rápidas
+            </h4>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label for="client-name" class="form-label">Nome do Cliente:</label>
+                    <input type="text" id="client-name" class="form-control" placeholder="Digite o nome">
+                </div>
+                <div class="col-md-3">
+                    <label for="client-phone" class="form-label">Telefone:</label>
+                    <input type="tel" id="client-phone" class="form-control" placeholder="(11) 99999-9999">
+                </div>
+                <div class="col-md-3">
+                    <label for="client-email" class="form-label">Email:</label>
+                    <input type="email" id="client-email" class="form-control" placeholder="cliente@email.com">
+                </div>
+                <div class="col-md-3">
+                    <label for="lead-source" class="form-label">Fonte:</label>
+                    <select id="lead-source" class="form-select">
+                        <option value="website">Website</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="google">Google Ads</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-primary" onclick="addClient()">
+                    <i class="fas fa-plus me-2"></i>Adicionar Cliente
+                </button>
+                <button class="btn btn-success" onclick="startCampaign()">
+                    <i class="fas fa-rocket me-2"></i>Iniciar Campanha
+                </button>
+                <button class="btn btn-warning" onclick="generateReport()">
+                    <i class="fas fa-chart-bar me-2"></i>Gerar Relatório
+                </button>
+            </div>
+        </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando dados...</p>
+        </div>
+        
+        <!-- Lista de Clientes -->
+        <div class="filter-section">
+            <h4 class="mb-3">
+                <i class="fas fa-users me-2"></i>Clientes Recentes (<span id="leads-count">3</span>)
+            </h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Email</th>
+                            <th>Fonte</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clients-tbody">
+                        <tr>
+                            <td><strong>João Silva</strong></td>
+                            <td>(11) 99999-1111</td>
+                            <td>joao@email.com</td>
+                            <td><span class="badge bg-primary">Website</span></td>
+                            <td><span class="badge bg-success">Ativo</span></td>
+                            <td>13/07/2025</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Maria Santos</strong></td>
+                            <td>(11) 99999-2222</td>
+                            <td>maria@email.com</td>
+                            <td><span class="badge bg-info">Facebook</span></td>
+                            <td><span class="badge bg-warning">Pendente</span></td>
+                            <td>13/07/2025</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pedro Costa</strong></td>
+                            <td>(11) 99999-3333</td>
+                            <td>pedro@email.com</td>
+                            <td><span class="badge bg-secondary">Instagram</span></td>
+                            <td><span class="badge bg-success">Ativo</span></td>
+                            <td>12/07/2025</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados simulados
+        let clients = [
+            { name: 'João Silva', email: 'joao@email.com', phone: '(11) 99999-1111', status: 'Ativo', source: 'Website' },
+            { name: 'Maria Santos', email: 'maria@email.com', phone: '(11) 99999-2222', status: 'Pendente', source: 'Facebook' },
+            { name: 'Pedro Costa', email: 'pedro@email.com', phone: '(11) 99999-3333', status: 'Ativo', source: 'Instagram' }
+        ];
+
+        // Inicializar gráficos
+        function initCharts() {
+            // Gráfico de Distribuição por Estágio
+            const stageCtx = document.getElementById('stageChart').getContext('2d');
+            new Chart(stageCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Novo Lead', 'Qualificado', 'Proposta', 'Negociação', 'Fechado'],
+                    datasets: [{
+                        data: [45, 30, 15, 8, 2],
+                        backgroundColor: [
+                            '#007bff',
+                            '#28a745',
+                            '#ffc107',
+                            '#fd7e14',
+                            '#dc3545'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Nível de Interesse
+            const interestCtx = document.getElementById('interestChart').getContext('2d');
+            new Chart(interestCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Baixo', 'Médio', 'Alto', 'Muito Alto'],
+                    datasets: [{
+                        label: 'Número de Leads',
+                        data: [12, 35, 28, 15],
+                        backgroundColor: [
+                            '#dc3545',
+                            '#ffc107',
+                            '#28a745',
+                            '#007bff'
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Funções principais
+        function addClient() {
+            const name = document.getElementById('client-name').value;
+            const phone = document.getElementById('client-phone').value;
+            const email = document.getElementById('client-email').value;
+            const source = document.getElementById('lead-source').value;
+
+            if (!name || !phone || !email) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            const newClient = {
+                name: name,
+                email: email,
+                phone: phone,
+                status: 'Ativo',
+                source: source
+            };
+
+            clients.push(newClient);
+            updateClientTable();
+            updateStats();
+            showNotification('Cliente adicionado com sucesso!', 'success');
+
+            // Limpar campos
+            document.getElementById('client-name').value = '';
+            document.getElementById('client-phone').value = '';
+            document.getElementById('client-email').value = '';
+        }
+
+        function startCampaign() {
+            showNotification('Campanha iniciada com sucesso!', 'success');
+            updateStats();
+        }
+
+        function generateReport() {
+            showNotification('Relatório sendo gerado...', 'info');
+            setTimeout(() => {
+                showNotification('Relatório gerado com sucesso!', 'success');
+            }, 2000);
+        }
+
+        // Funções auxiliares
+        function updateClientTable() {
+            const tbody = document.getElementById('clients-tbody');
+            tbody.innerHTML = '';
+
+            clients.slice(-3).reverse().forEach(client => {
+                const row = tbody.insertRow();
+                const statusClass = client.status === 'Ativo' ? 'bg-success' : 'bg-warning';
+                const sourceClass = {
+                    'website': 'bg-primary',
+                    'facebook': 'bg-info',
+                    'instagram': 'bg-secondary',
+                    'google': 'bg-danger'
+                }[client.source] || 'bg-secondary';
+                
+                row.innerHTML = `
+                    <td><strong>${client.name}</strong></td>
+                    <td>${client.phone}</td>
+                    <td>${client.email}</td>
+                    <td><span class="badge ${sourceClass}">${client.source}</span></td>
+                    <td><span class="badge ${statusClass}">${client.status}</span></td>
+                    <td>${new Date().toLocaleDateString('pt-BR')}</td>
+                `;
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('total-leads').textContent = Math.floor(Math.random() * 20) + 70;
+            document.getElementById('active-leads').textContent = Math.floor(Math.random() * 30) + 180;
+            document.getElementById('leads-count').textContent = clients.length;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Esconder loading
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 1500);
+            
+            // Inicializar gráficos
+            initCharts();
+            
+            // Atualizar estatísticas
+            updateStats();
+            
+            // Atualizar estatísticas periodicamente
+            setInterval(updateStats, 30000);
+        });
+    </script>
+</body>
+</html>
